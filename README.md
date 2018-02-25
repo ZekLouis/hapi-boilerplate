@@ -47,3 +47,8 @@ Hapi-boilerplate
 ├── readme.md
 └── server.js                   # fichier de lancement du projet
 ```
+
+
+Readme : Lister les vars d'env
+Indiquer comment lancer le projet
+Parler des dépendancesn(mongo, ...)

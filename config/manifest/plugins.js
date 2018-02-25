@@ -20,9 +20,24 @@ module.exports.init = server => (
                     },
                 }, done);
             },
-            boom(done) {
+            inert(done) {
                 server.register({
-                    register : require('hapi-boom-decorators'),
+                    register : require('inert'),
+                }, done);
+            },
+            vision(done) {
+                server.register({
+                    register : require('vision'),
+                }, done);
+            },
+            swagger(done) {
+                server.register({
+                    register : require('hapi-swagger'),
+                }, done);
+            },
+            users(done) {
+                server.register({
+                    register : require('../../app/plugins/users'),
                 }, done);
             },
         }, (err) => {
