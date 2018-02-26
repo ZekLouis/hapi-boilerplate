@@ -18,8 +18,8 @@ const all           = {
     mail : {
         service : 'gmail',
         auth    : {
-            user : 'hapilouisproject',
-            pass : '(hapilouisproject)',
+            user : process.env.MAIL_USER,
+            pass : process.env.MAIL_PASSWORD,
         },
     },
     databases : {

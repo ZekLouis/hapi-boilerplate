@@ -3,62 +3,19 @@
 const Promise = require('bluebird');
 const faker = require('faker');
 const Boom = require('boom');
-const Mailgen = require('mailgen');
-const nodemailer = require('nodemailer');
 const encrypt           = require('@zeklouis/iut-encrypt');
 
 // contient toutes les méthodes privées de votre plugin
-const internals = {
-    mailgen : new Mailgen({
-        theme   : 'default',
-        product : {
-            name : 'Users HAPI Project',
-            link : 'https://github.com/ZekLouis',
-        },
-    }),
-    newUserEmail(name, login, pass) {
-        return {
-            body :  {
-                name,
-                intro       : `Welcome to Users Project! We're very excited to have you on board. login : ${login}, password : ${pass}`,
-                dictionnary : {
-                    username : login,
-                    password : pass,
-                },
-                outro : 'See you soon on this beautiful API',
-            },
-        };
-    },
-    passwordLoginChanged(name, login, pass) {
-        console.log(name);
-        return {
-            body :  {
-                name,
-                intro       : 'Your password or your login has changed.',
-                outro : 'See you soon on this beautiful API',
-            },
-        };
-    },
-};
+const internals = {};
 
 const externals = {
-    new(data) {
+    new(data, sendmail) {
         const clearPassword = data.password;
         const user = new internals.server.database.users(data);
-        return user.save()
-            .then(() => {
-                const transporter = nodemailer.createTransport(internals.server.app.envs.mail);
-
-                const mail_data = {
-                    from    : 'hapilouisproject@gmail.com',
-                    to      : 'zeklouis@gmail.com', // user.email,
-                    subject : `[HAPI] ${user.lastname} ${user.firstname}: Registration`,
-                    html    : internals.mailgen.generate(internals.newUserEmail(`${user.lastname} ${user.firstname}`, user.login, clearPassword)),
-                    text    : internals.mailgen.generatePlaintext(internals.newUserEmail(`${user.lastname} ${user.firstname}`, user.login, clearPassword)),
-                };
-
-                transporter.sendMail(mail_data);
-            }).catch(e => Promise.reject(Boom.notFound('Cannot insert, email may already exist')));
+        if (sendmail) {
+            internals.server.plugins.mails.new(user, clearPassword);
+        }
+        return user.save();
     },
     get() {
         return internals.server.database.users.find({});
@@ -91,17 +48,7 @@ const externals = {
                 }
 
                 if (data.login !== user.login) {
-                    const transporter = nodemailer.createTransport(internals.server.app.envs.mail);
-
-                    const mail_data = {
-                        from    : 'hapilouisproject@gmail.com',
-                        to      : 'zeklouis@gmail.com', // user.email,
-                        subject : `[HAPI] ${user.lastname} ${user.firstname}: Password or login modification`,
-                        html    : internals.mailgen.generate(internals.passwordLoginChanged(`${user.lastname} ${user.firstname}`, user.login, user.password)),
-                        text    : internals.mailgen.generatePlaintext(internals.passwordLoginChanged(`${user.lastname} ${user.firstname}`, user.login, user.password)),
-                    };
-
-                    transporter.sendMail(mail_data);
+                    internals.server.plugins.mails.update(user);
                 }
                 user.set(data);
                 return user.save();
@@ -120,7 +67,7 @@ const externals = {
             });
         }
 
-        return Promise.map(users, user => externals.new(user));
+        return Promise.map(users, user => externals.new(user, false));
     },
     auth(login, password) {
         return internals.server.database.users.findOne({
@@ -143,17 +90,7 @@ const externals = {
                 user.set({
                     password,
                 });
-                const transporter = nodemailer.createTransport(internals.server.app.envs.mail);
-
-                const mail_data = {
-                    from    : 'hapilouisproject@gmail.com',
-                    to      : 'zeklouis@gmail.com', // user.email,
-                    subject : `[HAPI] ${user.lastname} ${user.firstname}: Password or login modification`,
-                    html    : internals.mailgen.generate(internals.passwordLoginChanged(`${user.lastname} ${user.firstname}`, user.login, user.password)),
-                    text    : internals.mailgen.generatePlaintext(internals.passwordLoginChanged(`${user.lastname} ${user.firstname}`, user.login, user.password)),
-                };
-
-                transporter.sendMail(mail_data);
+                internals.server.plugins.mails.update(user);
                 return user.save();
             } else {
                 return Promise.reject(Boom.notFound('User not found'));

@@ -2,6 +2,7 @@
 
 const handler = require('../handlers/default');
 const users = require('../handlers/users');
+const mails = require('../handlers/mails');
 const users_schema = require('../schemas/users');
 const Joi = require('joi');
 Joi.objectId = require('joi-objectId')(Joi);
@@ -15,7 +16,7 @@ exports.register = (server, options, next) => {
                 description : 'Authentication',
                 notes       : 'Authentification des utilisateurs',
                 tags        : ['api'],
-                handler     : users.auth,
+                handler     : mails.auth,
                 plugins     : {
                     'hapi-swagger' : {
                         payloadType : 'form',
@@ -125,12 +126,12 @@ exports.register = (server, options, next) => {
                 description : 'Modification du mot de passe d\'un user',
                 notes       : 'Modification du mot de passe d\'un user',
                 tags        : ['api'],
-                handler     : users.changePassword,
+                handler     : mails.changePassword,
                 validate    : {
                     params : {
-                        id      : Joi.objectId().required(),
+                        id          : Joi.objectId().required(),
                         oldpassword : Joi.string(),
-                        password : Joi.string(),
+                        password    : Joi.string(),
                     },
                 },
             },

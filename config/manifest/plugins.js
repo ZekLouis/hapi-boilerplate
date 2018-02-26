@@ -40,6 +40,11 @@ module.exports.init = server => (
                     register : require('../../app/plugins/users'),
                 }, done);
             },
+            mails(done) {
+                server.register({
+                    register : require('../../app/plugins/mails'),
+                }, done);
+            },
         }, (err) => {
             if (err) {
                 reject(err);
