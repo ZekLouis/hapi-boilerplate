@@ -40,6 +40,7 @@ const all           = {
             },
         },
     },
+    test_mail : process.env.MAIL_TEST ? process.env.MAIL_TEST : false,
 };
 
 module.exports = _.merge(all, env);

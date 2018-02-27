@@ -52,3 +52,11 @@ Hapi-boilerplate
 Readme : Lister les vars d'env
 Indiquer comment lancer le projet
 Parler des dépendancesn(mongo, ...)
+
+MONGO_HOST : adresse de la base mongodb - ex : MONGO_HOST=localhost;
+MONGO_NAME : nom de la base de donnée - ex : MONGO_NAME=filRouge;
+MONGO_USER : nom du user pour la base de donnée - ex : MONGO_USER=;
+MONGO_PASSWORD : password du user pour la base de donnée - ex : MONGO_PASSWORD=;
+MAIL_USER : nom d'utilisateur pour le compte gmail - ex : MAIL_USER=hapilouisproject;
+MAIL_PASSWORD : password de l'utilisateur pour le compte gmail : MAIL_PASSWORD=(hapilouisproject)
+MAIL_TEST : si ce paramètre est défini les mails seront envoyés à cette adresse (email de test)
